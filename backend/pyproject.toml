@@ -1,0 +1,17 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "cactus-backend"
+version = "0.1.0"
+description = ""
+authors = ["Indoc Research Europe <IndocResearchEurope@indocresearch.org>"]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.115.6"
+uvicorn = {extras = ["standard"], version = "^0.32.1"}
+pydantic = "^2.10.3"
+pydantic-settings = "^2.6.1"
+exoscale = "^0.10.0"
