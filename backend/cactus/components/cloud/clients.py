@@ -61,13 +61,12 @@ class CloudClient:
             #cloud-config
             runcmd:
               - "PUBLIC_IP=$(hostname -I | awk '{{print $1}}')"
-              - "GITHUB_OAUTH_CALLBACK_URL=http://$PUBLIC_IP:8080/hub/oauth_callback"
+              - "GITHUB_OAUTH_CALLBACK_URL=http://$PUBLIC_IP:8080/callback/{redirect_id}/"
               - >
                 sed -i
                 -e "s|GITHUB_OAUTH_CLIENT_ID|{self.github_oauth_client_id}|g"
                 -e "s|GITHUB_OAUTH_CLIENT_SECRET|{self.github_oauth_client_secret}|g"
                 -e "s|GITHUB_OAUTH_CALLBACK_URL|$GITHUB_OAUTH_CALLBACK_URL|g"
-                -e "s|INSTANCE_REDIRECT_ID|{redirect_id}|g"
                 /opt/tljh/config/config.yaml
               - "tljh-config reload"
             """
