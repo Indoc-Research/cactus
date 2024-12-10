@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport">
+    <title>Resource Creation</title>
+    <link href="/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+<div class="form-1-container section-container">
+    <div class="container">
+        <div class="header">
+            <h1>Resource creation</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1 form-1-box section-description wow fadeIn">
+                <h2>VM options</h2>
+                <div class="divider-1 wow fadeInUp"><span></span></div>
+                <p>Select options for a new virtual machine</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-10 offset-md-1 form-1-box wow fadeInUp">
+
+                <form action="" method="post" id="options">
+                    <!-- User's Credentials  -->
+                    <fieldset class="form-group border p-3">
+                        <legend class="w-auto px-2">VM type</legend>
+                        <div class="form-group">
+                            <input class="form-check-input" type="radio" id="cpu" name="type" value="cpu" checked/>
+                            <label class="form-check-label" for="cpu">CPU</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-check-input" type="radio" id="gpu" name="type" value="gpu"/>
+                            <label class="form-check-label" for="gpu">GPU</label>
+                        </div>
+                    </fieldset>
+                    <!-- User's Preferences  -->
+                    <fieldset class="form-group border p-3">
+                        <legend class="w-auto px-2">VM Size</legend>
+                        <div class="form-group">
+                            <input class="form-check-input" type="radio" id="small" name="size" value="small"/>
+                            <label class="form-check-label" for="small">Small</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-check-input" type="radio" id="medium" name="size" value="medium"
+                                   checked/>
+                            <label class="form-check-label" for="medium">Medium</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-check-input" type="radio" id="large" name="size" value="large"/>
+                            <label class="form-check-label" for="large">Large</label>
+                        </div>
+                    </fieldset>
+                    <!-- Python Environments  -->
+                    <fieldset class="form-group border p-3">
+                        <legend class="w-auto px-2">Python environments</legend>
+                        <div class="form-group">
+                            <input class="form-check-input" type="checkbox" id="na3" name="python" value="na3"/>
+                            <label class="form-check-label" for="na3">NeuralActivityCubic</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-check-input" type="checkbox" id="nbdev" name="python" value="nbdev" />
+                            <label class="form-check-label" for="nbdev">nbdev</label>
+                        </div>
+
+                        <div class="form-group">
+                            <input class="form-check-input" type="checkbox" id="scipy" name="python" value="scipy"/>
+                            <label class="form-check-label" for="scipy">SciPy</label>
+                        </div>
+
+                    </fieldset>
+                    <!-- Submit Button  -->
+                    <div class="form-group row text-right">
+                        <div class="col">
+                            <button type="submit" class="btn btn-primary btn-customized" onclick="collectData()">Launch</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="result" class="result">these are all selected options</div>
+</body>
+</html>
+<!-- JS  SECTION -->
+<script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+<script>
+    let collectData = () => {
+        let form = document.getElementById('options');
+        let formData = new FormData(form);
+        console.log(formData.get('type'));
+        console.log(formData.get('size'));
+        console.log(formData.getAll('python'));
+    };
+</script>
+
+<!-- STYLE  SECTION -->
+
+<style>
+    .result {
+        padding-top: 30px;
+        display: none;
+    }
+
+    .header {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .form-1-box {
+        padding-top: 30px;
+        text-align: left;
+    }
+
+    .form-1-box legend {
+        font-size: inherit;
+        line-height: 30px;
+        font-weight: 600;
+        text-transform: uppercase;
+        color: #555;
+    }
+
+    .form-1-box .form-check-label {
+        line-height: 1.5;
+        vertical-align: top;
+    }
+
+    .form-1-box input[type="text"],
+    .form-1-box input[type="email"],
+    .form-1-box input[type="password"] {
+        background: none;
+        border: 1px solid #ddd;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 15px;
+        font-weight: 400;
+        color: #888;
+        box-shadow: none;
+    }
+
+    .form-1-box input[type="text"]:focus,
+    .form-1-box input[type="email"]:focus,
+    .form-1-box input[type="password"]:focus {
+        outline: 0;
+        background: none;
+        border: 1px solid #db5d50;
+        box-shadow: none;
+    }
+
+    .form-1-box input[type="text"]::-moz-placeholder,
+    .form-1-box input[type="email"]::-moz-placeholder,
+    .form-1-box input[type="password"]::-moz-placeholder {
+        color: #bbb;
+        font-style: italic;
+    }
+
+    .form-1-box input[type="text"]:-ms-input-placeholder,
+    .form-1-box input[type="email"]:-ms-input-placeholder,
+    .form-1-box input[type="password"]:-ms-input-placeholder {
+        color: #bbb;
+        font-style: italic;
+    }
+
+    .form-1-box input[type="text"]::-webkit-input-placeholder,
+    .form-1-box input[type="email"]::-webkit-input-placeholder,
+    .form-1-box input[type="password"]::-webkit-input-placeholder {
+        color: #bbb;
+        font-style: italic;
+    }
+
+    .form-1-box button.btn-customized {
+        margin-top: 1rem;
+        padding: .75rem 1.5rem;
+        background: #db5d50;
+        border: 0;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 15px;
+        font-weight: 400;
+        color: #fff;
+        box-shadow: none;
+    }
+
+    .form-1-box button.btn-customized:hover,
+    .form-1-box button.btn-customized:active,
+    .form-1-box button.btn-customized:focus,
+    .form-1-box button.btn-customized:active:focus,
+    .form-1-box button.btn-customized.active:focus,
+    .form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active,
+    .form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active:focus {
+        outline: 0;
+        background: #ca594d;
+        border: 0;
+        color: #fff;
+        box-shadow: none;
+    }
+</style>
+
+<!-- STYLE  SECTION -->
