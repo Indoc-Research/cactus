@@ -19,12 +19,14 @@ class CloudClient:
         api_secret: str,
         zone: str,
         cloud_template_id: UUID,
+        security_group_id: UUID,
         host_instance_id: UUID,
         github_oauth_client_id: str,
         github_oauth_client_secret: str,
     ) -> None:
         self.client = ExoscaleClient(api_key, api_secret, zone=zone)
         self.cloud_template_id = cloud_template_id
+        self.security_group_id = security_group_id
         self.host_instance_id = host_instance_id
 
         self.github_oauth_client_id = github_oauth_client_id
@@ -75,7 +77,7 @@ class CloudClient:
         response = self.client.create_instance(
             public_ip_assignment='inet4',
             labels={'redirect_id': str(redirect_id)},
-            security_groups=[{'id': 'fd66389b-2256-4e36-95d0-06fc989cb4ac'}],
+            security_groups=[{'id': str(self.security_group_id)}],
             instance_type={'id': str(payload.size.to_id())},
             template={'id': str(self.cloud_template_id)},
             ssh_key={'name': 'antonio_key', 'fingerprint': '02:51:97:3e:d9:e3:a8:e2:fb:c7:b6:57:14:f9:c5:34'},
@@ -107,6 +109,7 @@ def get_cloud_client(settings: Settings = Depends(get_settings)) -> CloudClient:
         settings.cloud_api_secret,
         settings.cloud_zone,
         settings.cloud_template_id,
+        settings.cloud_security_group_id,
         settings.cloud_host_instance_id,
         settings.github_oauth_client_id,
         settings.github_oauth_client_secret,
