@@ -19,13 +19,13 @@ class Settings(BaseSettings):
     cloud_api_secret: str = 'PJt...'
     cloud_zone: str = 'de-fra-1'
     cloud_template_id: UUID = UUID(int=0)
-    cloud_host_instance_id: UUID = UUID(int=0)
     cloud_security_group_id: UUID = UUID(int=0)
+    cloud_host_url: str = 'https://example.com'
 
     github_oauth_client_id: str = ''
     github_oauth_client_secret: str = ''
 
-    vm_router_prefix: str = '/vm-router-prefix'
+    path_hash: str = '/path-hash'
 
 
 @lru_cache(1)

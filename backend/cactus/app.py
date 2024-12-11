@@ -11,7 +11,11 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     if settings is None:
         settings = get_settings()
 
-    app = FastAPI()
+    app = FastAPI(
+        openapi_url=f'{settings.path_hash}/openapi.json',
+        docs_url=f'{settings.path_hash}/docs',
+        redoc_url=None,
+    )
 
     setup_routers(app, settings)
     setup_middlewares(app)
@@ -22,7 +26,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 def setup_routers(app: FastAPI, settings: Settings) -> None:
     """Configure the application routers."""
 
-    app.include_router(vm_router, prefix=settings.vm_router_prefix)
+    app.include_router(vm_router, prefix=settings.path_hash)
 
 
 def setup_middlewares(app: FastAPI) -> None:

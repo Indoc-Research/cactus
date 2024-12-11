@@ -9,6 +9,7 @@ class Instance(BaseModel):
     id: UUID
     name: str
     public_ip: str = Field(alias='public-ip', serialization_alias='public_ip')
+    labels: dict[str, str]
 
 
 class InstanceType(StrEnum):
