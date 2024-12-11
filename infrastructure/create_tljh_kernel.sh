@@ -13,6 +13,9 @@ show_help() {
     echo ""
     echo "Example:"
     echo " $0 '3.11' 'uniq-na3-1234' 'kernel with na3' package1 package2"
+    echo ""
+    echo "Flags:"
+    echo "  --url <REPO_URL>    Git repository URL to install a package from source"
     exit 0
 }
 
@@ -34,12 +37,31 @@ PYTHON_VERSION="$1"
 UNIQUE_ENV_NAME="$2"
 KERNEL_DISPLAY_NAME="$3"
 shift 3 # Remove the first three arguments so the remaining ones can be treated as PIP_PACKAGES
-PIP_PACKAGES=("$@")
 
-# Create the Python environment with ipykernel
-sudo $CONDA_BIN create -n $UNIQUE_ENV_NAME python=$PYTHON_VERSION -y
-sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install "${PIP_PACKAGES[@]}"
-sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install ipykernel
+# Check for --url flag
+if [[ "$1" == "--url" ]]; then
+    # TODO fix sudo logic and folder permissions. For now it's working, but solution is not ideal.
+    REPO_URL="$2"
+    SHARED_DIR="/srv/shared_repos"
+    REPO_DIR="$SHARED_DIR/$(basename "$REPO_URL" .git)"
+    sudo mkdir -p "$SHARED_DIR"
+    sudo chmod 775 "$SHARED_DIR"
+    sudo chown :users "$SHARED_DIR"
+    sudo git clone "$REPO_URL" "$REPO_DIR"
+    sudo chmod -R 775 "$REPO_DIR"
+    sudo chown -R :users "$REPO_DIR"
+    cd "$REPO_DIR"
+    sudo $CONDA_BIN create -n $UNIQUE_ENV_NAME python=$PYTHON_VERSION -y
+    sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install -e .
+    sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install ipykernel
+    cd -
+else
+    PIP_PACKAGES=("$@")
+    # Create the Python environment with ipykernel
+    sudo $CONDA_BIN create -n $UNIQUE_ENV_NAME python=$PYTHON_VERSION -y
+    sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install "${PIP_PACKAGES[@]}"
+    sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install ipykernel
+fi
 
 # Register the kernel with TLJH
 sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME python -m ipykernel install \
