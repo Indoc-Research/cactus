@@ -18,14 +18,14 @@ const server = http.createServer((req, res) => {
     fs.readFile(filePath, (err, data) => {
         if (err) {
             if (err.code === 'ENOENT') {
-                res.writeHead(404, { 'Content-Type': 'text/plain' });
+                res.writeHead(404, {'Content-Type': 'text/plain'});
                 res.end('404 Not Found');
             } else {
-                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.writeHead(500, {'Content-Type': 'text/plain'});
                 res.end('Internal Server Error');
             }
         } else {
-            res.writeHead(200, { 'Content-Type': contentType });
+            res.writeHead(200, {'Content-Type': contentType});
             res.end(data);
         }
     });
