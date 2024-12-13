@@ -6,6 +6,7 @@ from textwrap import indent
 from uuid import UUID
 from uuid import uuid4
 
+import requests
 from cactus.components.cloud.models import Instance
 from cactus.components.repo.validators import RepoValidator
 from cactus.components.repo.validators import get_repo_validator
@@ -19,12 +20,14 @@ from fastapi import Depends
 class CloudClient:
     def __init__(
         self,
+        *,
         api_key: str,
         api_secret: str,
         zone: str,
         template_id: UUID,
         security_group_id: UUID,
         host_url: str,
+        jhub_port: int,
         github_oauth_client_id: str,
         github_oauth_client_secret: str,
         setup_environment_script_path: Path,
@@ -34,6 +37,8 @@ class CloudClient:
         self.template_id = template_id
         self.security_group_id = security_group_id
         self.host_url = host_url
+
+        self.jhub_port = jhub_port
 
         self.github_oauth_client_id = github_oauth_client_id
         self.github_oauth_client_secret = github_oauth_client_secret
@@ -63,6 +68,22 @@ class CloudClient:
         instance = Instance.model_validate(response)
 
         return instance
+
+    def get_instance_status(self, instance_id: UUID) -> str:
+        instance = self.get_instance(instance_id)
+
+        try:
+            response = requests.get(f'http://{instance.public_ip}:{self.jhub_port}/hub/login', timeout=5)
+        except requests.exceptions.RequestException:
+            return 'error'
+
+        if response.status_code == 200:
+            return 'ready'
+
+        if response.status_code == 502:
+            return 'starting'
+
+        return 'unknown'
 
     def find_instance(self, redirect_id: UUID) -> Instance | None:
         instances = self.list_instances()
@@ -150,14 +171,15 @@ def get_cloud_client(
     setup_environment_script_path = Path(__file__).parent / 'create_tljh_kernel.sh'
 
     return CloudClient(
-        settings.cloud_api_key,
-        settings.cloud_api_secret,
-        settings.cloud_zone,
-        settings.cloud_template_id,
-        settings.cloud_security_group_id,
-        settings.cloud_host_url,
-        settings.github_oauth_client_id,
-        settings.github_oauth_client_secret,
-        setup_environment_script_path,
-        repo_validator,
+        api_key=settings.cloud_api_key,
+        api_secret=settings.cloud_api_secret,
+        zone=settings.cloud_zone,
+        template_id=settings.cloud_template_id,
+        security_group_id=settings.cloud_security_group_id,
+        host_url=settings.cloud_host_url,
+        jhub_port=settings.jhub_port,
+        github_oauth_client_id=settings.github_oauth_client_id,
+        github_oauth_client_secret=settings.github_oauth_client_secret,
+        setup_environment_script_path=setup_environment_script_path,
+        repo_validator=repo_validator,
     )

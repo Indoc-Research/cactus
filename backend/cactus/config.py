@@ -22,6 +22,8 @@ class Settings(BaseSettings):
     cloud_security_group_id: UUID = UUID(int=0)
     cloud_host_url: str = 'https://example.com'
 
+    jhub_port: int = 8080
+
     github_oauth_client_id: str = ''
     github_oauth_client_secret: str = ''
 

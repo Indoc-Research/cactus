@@ -52,3 +52,7 @@ class InstanceCreateSchema(BaseSchema):
             raise ValueError('Either "python_envs" or "repo_urls" must be set')
 
         return self
+
+
+class InstanceStatusResponseSchema(BaseSchema):
+    jhub: str
