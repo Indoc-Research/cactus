@@ -1,3 +1,4 @@
+from cactus.components.repo import repo_router
 from cactus.components.vm import vm_router
 from cactus.config import Settings
 from cactus.config import get_settings
@@ -30,6 +31,7 @@ def setup_routers(app: FastAPI, settings: Settings) -> None:
     """Configure the application routers."""
 
     app.include_router(vm_router, prefix=settings.path_hash)
+    app.include_router(repo_router, prefix=settings.path_hash)
 
 
 def setup_middlewares() -> list[Middleware]:

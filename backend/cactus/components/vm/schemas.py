@@ -2,8 +2,10 @@ from typing import Any
 
 from cactus.components.cloud.models import InstanceType
 from cactus.components.schemas import BaseSchema
+from pydantic import HttpUrl
 from pydantic import conlist
 from pydantic import field_validator
+from pydantic import model_validator
 
 KERNELS = {
     'neuralactivitycubic': {
@@ -29,11 +31,12 @@ KERNELS = {
 
 class InstanceCreateSchema(BaseSchema):
     size: InstanceType = InstanceType.SMALL
-    python_env: conlist(str, min_length=1)
+    python_envs: conlist(str, min_length=1) | None = None
+    repo_urls: conlist(HttpUrl, min_length=1) | None = None
 
-    @field_validator('python_env')
+    @field_validator('python_envs')
     @classmethod
-    def validate_python_env(cls, values: list[str]) -> list[dict[str, Any]]:
+    def validate_python_envs(cls, values: list[str]) -> list[dict[str, Any]]:
         envs = []
 
         for value in values:
@@ -42,3 +45,10 @@ class InstanceCreateSchema(BaseSchema):
             envs.append(KERNELS[value])
 
         return envs
+
+    @model_validator(mode='after')
+    def validate_attributes(self):
+        if self.python_envs is None and self.repo_urls is None:
+            raise ValueError('Either "python_envs" or "repo_urls" must be set')
+
+        return self

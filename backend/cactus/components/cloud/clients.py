@@ -1,10 +1,14 @@
 import base64
 import time as tm
+from pathlib import Path
 from textwrap import dedent
+from textwrap import indent
 from uuid import UUID
 from uuid import uuid4
 
 from cactus.components.cloud.models import Instance
+from cactus.components.repo.validators import RepoValidator
+from cactus.components.repo.validators import get_repo_validator
 from cactus.components.vm.schemas import InstanceCreateSchema
 from cactus.config import Settings
 from cactus.config import get_settings
@@ -23,6 +27,8 @@ class CloudClient:
         host_url: str,
         github_oauth_client_id: str,
         github_oauth_client_secret: str,
+        setup_environment_script_path: Path,
+        repo_validator: RepoValidator,
     ) -> None:
         self.client = ExoscaleClient(api_key, api_secret, zone=zone)
         self.template_id = template_id
@@ -31,6 +37,9 @@ class CloudClient:
 
         self.github_oauth_client_id = github_oauth_client_id
         self.github_oauth_client_secret = github_oauth_client_secret
+
+        self.setup_environment_script = setup_environment_script_path.read_text()
+        self.repo_validator = repo_validator
 
     def wait_for_operation_state(self, operation_id: UUID, status: str = 'success', timeout: int = 300) -> None:
         end_time = tm.perf_counter() + timeout
@@ -65,13 +74,23 @@ class CloudClient:
     def create_instance(self, payload: InstanceCreateSchema) -> Instance:
         redirect_id = uuid4()
 
-        setup_envs_commands = ''
-        for env in payload.python_env:
+        setup_environment_commands = ''
+        for env in payload.python_envs or []:
             packages = "', '".join(env['PIP_PACKAGES'])
 
-            setup_envs_commands += f"""
+            setup_environment_commands += f"""
                 /usr/local/bin/setup_environment.sh \
-                '{env["PYTHON_VERSION"]}' '{env["UNIQUE_ENV_NAME"]}' '{env["KERNEL_DISPLAY_NAME"]}' '{packages}'"""
+                '{env["PYTHON_VERSION"]}' '{env["UNIQUE_ENV_NAME"]}' '{env["KERNEL_DISPLAY_NAME"]}' \
+                '{packages}'"""
+
+        for repo_url in payload.repo_urls or []:
+            repo = self.repo_validator.get_validation_results(str(repo_url))
+            setup_environment_commands += f"""
+                /usr/local/bin/setup_environment.sh \
+                '{repo["PYTHON_VERSION"].lstrip('>=')}' '{repo["UNIQUE_ENV_NAME"]}' '{repo["UNIQUE_ENV_NAME"]}' \
+                --url '{repo_url}'"""
+
+        setup_environment_script = '\n' + indent(self.setup_environment_script, ' ' * 18)
 
         user_data = dedent(
             f"""
@@ -80,70 +99,17 @@ class CloudClient:
               - path: /usr/local/bin/setup_environment.sh
                 permissions: '0755'
                 owner: root:root
-                content: |
-                  #!/usr/bin/env bash
-                  set -e
-
-                  # Helper function to display usage
-                  show_help() {{
-                      echo "Usage: $0 <PYTHON_VERSION> <UNIQUE_ENV_NAME> <KERNEL_DISPLAY_NAME> <PIP_PACKAGE>"
-                      echo ""
-                      echo "Arguments:"
-                      echo "  PYTHON_VERSION       Python version to use for the environment (e.g., 3.9)"
-                      echo "  UNIQUE_ENV_NAME      Unique name for the environment (e.g., envA)"
-                      echo "  KERNEL_DISPLAY_NAME  Display name for the Jupyter kernel (e.g., Python (envA))"
-                      echo "  PIP_PACKAGE          Python package to install via pip (e.g., neuralactivitycubic)"
-                      echo ""
-                      echo "Example:"
-                      echo " $0 '3.11' 'uniq-na3-1234' 'kernel with na3' 'neuralactivitycubic'"
-                      exit 0
-                  }}
-
-                  # Check if --help was passed
-                  if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-                      show_help
-                  fi
-
-                  # Check if required arguments are provided
-                  if [[ $# -ne 4 ]]; then
-                      echo "Error: Missing arguments."
-                      echo "Run '$0 --help' for usage instructions."
-                      exit 1
-                  fi
-
-                  # VARS
-                  CONDA_BIN="/opt/tljh/user/bin/conda"
-                  PYTHON_VERSION="$1"
-                  UNIQUE_ENV_NAME="$2"
-                  KERNEL_DISPLAY_NAME="$3"
-                  PIP_PACKAGE="$4"
-
-                  # Create the Python environment with ipykernel
-                  sudo $CONDA_BIN create -n $UNIQUE_ENV_NAME python=$PYTHON_VERSION -y
-                  sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install $PIP_PACKAGE
-                  sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME pip install ipykernel
-                  # Register the kernel with TLJH
-                  sudo /opt/tljh/user/bin/conda run -n $UNIQUE_ENV_NAME python -m ipykernel install \
-                      --prefix=/opt/tljh/user \
-                      --name $UNIQUE_ENV_NAME \
-                      --display-name "$KERNEL_DISPLAY_NAME"
-
-                  echo "Environments and kernels created successfully!"
-
-                  echo "Don't forget to restart TLJH if you want to apply changes:"
-                  echo "sudo systemctl restart jupyterhub"
-
+                content: | {setup_environment_script}
             runcmd:
-              - "GITHUB_OAUTH_CALLBACK_URL={self.host_url}/vms/oauth/{redirect_id}"
               - >
                 sed -i
                 -e "s|GITHUB_OAUTH_CLIENT_ID|{self.github_oauth_client_id}|g"
                 -e "s|GITHUB_OAUTH_CLIENT_SECRET|{self.github_oauth_client_secret}|g"
-                -e "s|GITHUB_OAUTH_CALLBACK_URL|$GITHUB_OAUTH_CALLBACK_URL|g"
+                -e "s|GITHUB_OAUTH_CALLBACK_URL|{self.host_url}/vms/oauth/{redirect_id}|g"
                 /opt/tljh/config/config.yaml
               - "tljh-config reload"
               - "systemctl stop jupyterhub"
-              - | {setup_envs_commands}
+              - | {setup_environment_commands}
               - "systemctl start jupyterhub"
             """
         )
@@ -177,7 +143,11 @@ class CloudClient:
         return instance
 
 
-def get_cloud_client(settings: Settings = Depends(get_settings)) -> CloudClient:
+def get_cloud_client(
+    settings: Settings = Depends(get_settings), repo_validator: RepoValidator = Depends(get_repo_validator)
+) -> CloudClient:
+    setup_environment_script_path = Path(__file__).parent / 'create_tljh_kernel.sh'
+
     return CloudClient(
         settings.cloud_api_key,
         settings.cloud_api_secret,
@@ -187,4 +157,6 @@ def get_cloud_client(settings: Settings = Depends(get_settings)) -> CloudClient:
         settings.cloud_host_url,
         settings.github_oauth_client_id,
         settings.github_oauth_client_secret,
+        setup_environment_script_path,
+        repo_validator,
     )
