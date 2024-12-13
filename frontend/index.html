@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport">
@@ -10,90 +10,180 @@
 <body>
 <div class="form-1-container section-container">
     <div class="container">
-        <div class="header">
-            <h1>Resource creation</h1>
-        </div>
-        <div class="row">
-            <div class="col-md-10 offset-md-1 form-1-box section-description wow fadeIn">
-                <h2>VM options</h2>
-                <div class="divider-1 wow fadeInUp"><span></span></div>
-                <p>Select options for a new virtual machine</p>
+        <div class="row justify-content-center">
+            <div class="col-sm text-center">
+                <div class="header">
+                    <h1>Resource management</h1>
+                </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-md-10 offset-md-1 form-1-box wow fadeInUp">
+            <div class="d-grid col-6">
+                <button type="button" id="createControl" data-bs-toggle="collapse"
+                        data-bs-target="#instanceCreationForm"
+                        aria-expanded="false"
+                        class="btn btn-primary btn-customized btn-lg">
+                    Create a new instance
+                </button>
+            </div>
+            <div class="d-grid col-6">
+                <button type="button" id="listControl" data-bs-toggle="collapse"
+                        data-bs-target="#instanceListTable"
+                        aria-expanded="false"
+                        class="btn btn-primary btn-customized btn-lg">
+                    Show currently available instances
+                </button>
+            </div>
+        </div>
+        <div class="row collapse" id="instanceCreationForm" aria-expanded="false">
+            <div class="col-md-12">
+                <form action="" id="creationForm" method="post">
+                    <div class="row justify-content-center">
+                        <div class="col-md-10 form-1-box section-description wow fadeIn">
+                            <h2>VM options</h2>
+                            <div class="divider-1 wow fadeInUp"><span></span></div>
+                            <p>Select options for a new virtual machine</p>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-10 form-1-box wow fadeInUp">
+                            <!-- VM type  -->
+                            <fieldset class="form-group border p-3">
+                                <legend class="w-auto px-2">VM type</legend>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="radio" id="cpu" name="type" value="cpu"
+                                           checked/>
+                                    <label class="form-check-label" for="cpu">CPU</label>
+                                </div>
 
-                <form action="" method="post" id="options">
-                    <!-- User's Credentials  -->
-                    <fieldset class="form-group border p-3">
-                        <legend class="w-auto px-2">VM type</legend>
-                        <div class="form-group">
-                            <input class="form-check-input" type="radio" id="cpu" name="type" value="cpu" checked/>
-                            <label class="form-check-label" for="cpu">CPU</label>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="radio" id="gpu" name="type" value="gpu"/>
+                                    <label class="form-check-label" for="gpu">GPU</label>
+                                </div>
+                            </fieldset>
+                            <!-- VM Size  -->
+                            <fieldset class="form-group border p-3">
+                                <legend class="w-auto px-2">VM Size</legend>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="radio" id="small" name="size" value="small"/>
+                                    <label class="form-check-label" for="small">Small</label>
+                                </div>
 
-                        <div class="form-group">
-                            <input class="form-check-input" type="radio" id="gpu" name="type" value="gpu"/>
-                            <label class="form-check-label" for="gpu">GPU</label>
-                        </div>
-                    </fieldset>
-                    <!-- User's Preferences  -->
-                    <fieldset class="form-group border p-3">
-                        <legend class="w-auto px-2">VM Size</legend>
-                        <div class="form-group">
-                            <input class="form-check-input" type="radio" id="small" name="size" value="small"/>
-                            <label class="form-check-label" for="small">Small</label>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="radio" id="medium" name="size" value="medium"
+                                           checked/>
+                                    <label class="form-check-label" for="medium">Medium</label>
+                                </div>
 
-                        <div class="form-group">
-                            <input class="form-check-input" type="radio" id="medium" name="size" value="medium"
-                                   checked/>
-                            <label class="form-check-label" for="medium">Medium</label>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="radio" id="large" name="size" value="large"/>
+                                    <label class="form-check-label" for="large">Large</label>
+                                </div>
+                            </fieldset>
+                            <!-- Python Environments  -->
+                            <fieldset class="form-group border p-3">
+                                <legend class="w-auto px-2">Python environments</legend>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="checkbox" id="neuralactivitycubic"
+                                           name="python"
+                                           value="neuralactivitycubic"/>
+                                    <label class="form-check-label"
+                                           for="neuralactivitycubic">NeuralActivityCubic</label>
+                                </div>
 
-                        <div class="form-group">
-                            <input class="form-check-input" type="radio" id="large" name="size" value="large"/>
-                            <label class="form-check-label" for="large">Large</label>
-                        </div>
-                    </fieldset>
-                    <!-- Python Environments  -->
-                    <fieldset class="form-group border p-3">
-                        <legend class="w-auto px-2">Python environments</legend>
-                        <div class="form-group">
-                            <input class="form-check-input" type="checkbox" id="na3" name="python" value="na3"/>
-                            <label class="form-check-label" for="na3">NeuralActivityCubic</label>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="checkbox" id="nbdev" name="python"
+                                           value="nbdev"/>
+                                    <label class="form-check-label" for="nbdev">nbdev</label>
+                                </div>
 
-                        <div class="form-group">
-                            <input class="form-check-input" type="checkbox" id="nbdev" name="python" value="nbdev"/>
-                            <label class="form-check-label" for="nbdev">nbdev</label>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-check-input" type="checkbox" id="sklearn" name="python"
+                                           value="sklearn"/>
+                                    <label class="form-check-label" for="sklearn">scikit-learn</label>
+                                </div>
 
-                        <div class="form-group">
-                            <input class="form-check-input" type="checkbox" id="scipy" name="python" value="scipy"/>
-                            <label class="form-check-label" for="scipy">SciPy</label>
-                        </div>
-
-                    </fieldset>
-                    <!-- Submit Button  -->
-                    <div class="form-group row text-right">
-                        <div class="col">
-                            <button type="button" id="launch" class="btn btn-primary btn-customized">Launch</button>
+                            </fieldset>
+                            <!-- Submit Button  -->
+                            <div class="form-group row text-center mb-5">
+                                <div class="d-grid gap-2">
+                                    <button type="button" id="launch" class="btn btn-primary btn-customized btn-lg">
+                                        Launch
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
+        <div class="row justify-content-center collapse mb-5" id="instanceListTable">
+            <div class="row justify-content-center">
+                <div class="col-md-10 form-1-box section-description wow fadeIn">
+                    <h2>All currently available instances</h2>
+                </div>
+            </div>
+            <!-- HEADER -->
+            <div class="row justify-content-center text-center">
+                <div class="col-md-10 section-description bg-secondary-subtle h4">
+                    <div class="row justify-content-center text-center">
+                        <div class="col-4 border">
+                            IP Address
+                        </div>
+                        <div class="col-4 border">
+                            Name
+                        </div>
+                        <div class="col-4 border">
+                            Actions
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- BODY -->
+            <div class="row justify-content-center text-center">
+                <div class="col-md-10" id="instancesTable">
+                    <!-- here be dragons -->
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
-<div id="result" class="d-none">these are all selected options</div>
+<div id="display" class="d-none">these are all selected options</div>
 </body>
 </html>
 <!-- JS  SECTION -->
 <script type="module">
-    const createInstance = (body) => {
-        const url = 'http://127.0.0.1:9991/vms/';  // Replace with your URL
+    const createColumn = (content, size = 4) => {
+        let col = document.createElement('div');
+        col.classList.add(`col-${size}`, 'border');
+        content instanceof Element ? col.appendChild(content) : col.innerText = content;
+        return col
+    }
+
+    const makeLink = (url) => {
+        let a = document.createElement('a');
+        a.href = 'http://' + url;
+        a.textContent = url;
+        return a
+    }
+
+    const createInstanceRow = (instance) => {
+        let row = document.createElement('div');
+        row.classList.add('row', 'justify-content-center', 'text-center');
+        row.appendChild(createColumn(makeLink(`${instance.public_ip}:8080`)));
+        row.appendChild(createColumn(instance.name));
+        row.appendChild(createColumn('WIP: button DELETE'));
+        return row
+    }
+
+    const appendInstanceRows = (rows) => {
+        let table = document.getElementById('instancesTable');
+        table.replaceChildren(...rows);
+    }
+
+    const listInstances = () => {
+        let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
 
         fetch(url, {
             method: 'GET',
@@ -101,26 +191,63 @@
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
             },
-            // body: body
         })
             .then(response => response.json())  // Parses the JSON response
-            .then(data => console.log('Success:', data))
+            .then(data => {
+                let instanceRows = data.map(instance => createInstanceRow(instance));
+                appendInstanceRows(instanceRows);
+            })
             .catch(error => console.error('Error:', error));
     };
 
     const collectData = () => {
-        let form = document.getElementById('options');
+        let form = document.getElementById('creationForm');
         let formData = new FormData(form);
-        let result = document.getElementById('result')
-        result.textContent = JSON.stringify({
-            python_env: formData.getAll('python'),
+        return JSON.stringify({
+            python_envs: formData.getAll('python'),
             size: formData.get('size')
         });
-        result.classList.remove('d-none');
-        createInstance(result.textContent);
     };
 
-    document.getElementById('launch').addEventListener('click', collectData);
+    const createInstance = () => {
+        let body = collectData();
+
+        let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: body
+        })
+            .then(response => response.json())  // Parses the JSON response
+            .then(data => {
+                let display = document.getElementById('result');
+                display.textContent = data;
+                console.log(data);
+                display.classList.remove('do-none');
+            })
+            .catch(error => console.error('Error:', error));
+    };
+
+    const controlCollapse = () => {
+        let instanceListTable = document.getElementById('instanceListTable');
+        let instanceCreationForm = document.getElementById('instanceCreationForm');
+
+        let instanceListTableCollapse = new bootstrap.Collapse(instanceListTable, { toggle: false });
+        let instanceCreationFormCollapse = new bootstrap.Collapse(instanceCreationForm, { toggle: false });
+
+        instanceListTable.addEventListener('show.bs.collapse', event => instanceCreationFormCollapse.hide());
+        instanceCreationForm.addEventListener('show.bs.collapse', event => instanceListTableCollapse.hide());
+    }
+
+
+    document.getElementById('instanceListTable').addEventListener('shown.bs.collapse', listInstances);
+    document.getElementById('launch').addEventListener('click', createInstance);
+    controlCollapse();
+
 </script>
 <!-- STYLE  SECTION -->
 
