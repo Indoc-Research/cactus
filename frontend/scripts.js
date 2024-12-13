@@ -1,3 +1,5 @@
+const BASE_URL = 'http://127.0.0.1:9991/path-hash/';
+
 const createColumn = (content, size = 4) => {
     let col = document.createElement('div');
     col.classList.add(`col-${size}`, 'border');
@@ -27,7 +29,7 @@ const appendInstanceRows = (rows) => {
 }
 
 const listInstances = () => {
-    let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
+    let url = BASE_URL + 'vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'GET',
@@ -52,7 +54,7 @@ const collectFormData = () => {
 const createInstance = () => {
     let formData = collectFormData();
 
-    let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
+    let url = BASE_URL + 'vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'POST',
@@ -100,7 +102,7 @@ const repoValidationFail = () => {
 const checkCustomRepo = () => {
     let formData = collectFormData();
 
-    let url = 'http://127.0.0.1:9991/path-hash/repos/validate/' + formData.get('customRepo');
+    let url = BASE_URL + 'repos/validate/' + formData.get('customRepo');
 
     fetch(url, {
         method: 'GET',
