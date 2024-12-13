@@ -85,9 +85,10 @@ class CloudClient:
 
         for repo_url in payload.repo_urls or []:
             repo = self.repo_validator.get_validation_results(str(repo_url))
+            kernel_display_name = f'Python (with {repo["UNIQUE_ENV_NAME"]})'
             setup_environment_commands += f"""
                 /usr/local/bin/setup_environment.sh \
-                '{repo["PYTHON_VERSION"].lstrip('>=')}' '{repo["UNIQUE_ENV_NAME"]}' '{repo["UNIQUE_ENV_NAME"]}' \
+                '{repo["PYTHON_VERSION"].lstrip('>=')}' '{repo["UNIQUE_ENV_NAME"]}' '{kernel_display_name}' \
                 --url '{repo_url}'"""
 
         setup_environment_script = '\n' + indent(self.setup_environment_script, ' ' * 18)
