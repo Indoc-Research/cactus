@@ -104,7 +104,22 @@
                                 </div>
 
                             </fieldset>
-                            <!-- Submit Button  -->
+                            <!-- Custom Repo -->
+                            <fieldset class="form-group border p-3">
+                                <legend class="w-auto px-2">Additional Package</legend>
+                                <div class="row">
+                                    <div class="col input-group">
+                                        <input class="form-control" type="url" id="customRepo" name="customRepo"
+                                               value="" placeholder="https://github.com/"/>
+                                        <label for="customRepo"></label>
+                                        <button class="btn btn-primary" type="button" id="check">Check</button>
+                                    </div>
+                                    <div class="form-text" id="basic-addon4">
+                                            A custom repository url with Python package
+                                    </div>
+                                </div>
+                            </fieldset>
+                            <!-- Submit Button -->
                             <div class="form-group row text-center mb-5">
                                 <div class="d-grid gap-2">
                                     <button type="button" id="launch" class="btn btn-primary btn-customized btn-lg">
@@ -200,17 +215,13 @@
             .catch(error => console.error('Error:', error));
     };
 
-    const collectData = () => {
+    const collectFormData = () => {
         let form = document.getElementById('creationForm');
-        let formData = new FormData(form);
-        return JSON.stringify({
-            python_envs: formData.getAll('python'),
-            size: formData.get('size')
-        });
+        return new FormData(form);
     };
 
     const createInstance = () => {
-        let body = collectData();
+        let formData = collectFormData();
 
         let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
 
@@ -220,24 +231,39 @@
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*',
             },
-            body: body
+            body: JSON.stringify({
+            python_envs: formData.getAll('python'),
+            size: formData.get('size')
+        })
         })
             .then(response => response.json())  // Parses the JSON response
-            .then(data => {
-                let display = document.getElementById('result');
-                display.textContent = data;
-                console.log(data);
-                display.classList.remove('do-none');
-            })
+            .then(data => {listInstances();})
             .catch(error => console.error('Error:', error));
     };
+
+    const checkCustomRepo = () => {
+        let formData = collectFormData();
+
+        let url = 'http://127.0.0.1:9991/path-hash/repos/validate/' + formData.get('customRepo');
+
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            },
+        })
+            .then(response => response.json())  // Parses the JSON response
+            .then(data => console.log(data))
+            .catch(error => console.error('Error:', error));
+    }
 
     const controlCollapse = () => {
         let instanceListTable = document.getElementById('instanceListTable');
         let instanceCreationForm = document.getElementById('instanceCreationForm');
 
-        let instanceListTableCollapse = new bootstrap.Collapse(instanceListTable, { toggle: false });
-        let instanceCreationFormCollapse = new bootstrap.Collapse(instanceCreationForm, { toggle: false });
+        let instanceListTableCollapse = new bootstrap.Collapse(instanceListTable, {toggle: false});
+        let instanceCreationFormCollapse = new bootstrap.Collapse(instanceCreationForm, {toggle: false});
 
         instanceListTable.addEventListener('show.bs.collapse', event => instanceCreationFormCollapse.hide());
         instanceCreationForm.addEventListener('show.bs.collapse', event => instanceListTableCollapse.hide());
@@ -246,6 +272,7 @@
 
     document.getElementById('instanceListTable').addEventListener('shown.bs.collapse', listInstances);
     document.getElementById('launch').addEventListener('click', createInstance);
+    document.getElementById('check').addEventListener('click', checkCustomRepo);
     controlCollapse();
 
 </script>
