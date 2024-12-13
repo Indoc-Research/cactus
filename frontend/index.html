@@ -31,7 +31,7 @@
                         data-bs-target="#instanceListTable"
                         aria-expanded="false"
                         class="btn btn-primary btn-customized btn-lg">
-                    Show currently available instances
+                    Currently available instances
                 </button>
             </div>
         </div>
@@ -112,10 +112,10 @@
                                         <input class="form-control" type="url" id="customRepo" name="customRepo"
                                                value="" placeholder="https://github.com/"/>
                                         <label for="customRepo"></label>
-                                        <button class="btn btn-primary" type="button" id="check">Check</button>
+                                        <button class="btn btn-primary" type="button" id="check">Check Repository</button>
                                     </div>
                                     <div class="form-text" id="basic-addon4">
-                                            A custom repository url with Python package
+                                        A custom repository url with Python package
                                     </div>
                                 </div>
                             </fieldset>
@@ -160,6 +160,13 @@
                     <!-- here be dragons -->
                 </div>
             </div>
+            <div class="row justify-content-center text-center">
+                <div class="col-8 d-grid gap-2 mt-5">
+                    <button type="button" id="refresh" class="btn btn-secondary btn-lg">
+                        Refresh the list of instances
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -168,114 +175,7 @@
 </body>
 </html>
 <!-- JS  SECTION -->
-<script type="module">
-    const createColumn = (content, size = 4) => {
-        let col = document.createElement('div');
-        col.classList.add(`col-${size}`, 'border');
-        content instanceof Element ? col.appendChild(content) : col.innerText = content;
-        return col
-    }
-
-    const makeLink = (url) => {
-        let a = document.createElement('a');
-        a.href = 'http://' + url;
-        a.textContent = url;
-        return a
-    }
-
-    const createInstanceRow = (instance) => {
-        let row = document.createElement('div');
-        row.classList.add('row', 'justify-content-center', 'text-center');
-        row.appendChild(createColumn(makeLink(`${instance.public_ip}:8080`)));
-        row.appendChild(createColumn(instance.name));
-        row.appendChild(createColumn('WIP: button DELETE'));
-        return row
-    }
-
-    const appendInstanceRows = (rows) => {
-        let table = document.getElementById('instancesTable');
-        table.replaceChildren(...rows);
-    }
-
-    const listInstances = () => {
-        let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-            .then(response => response.json())  // Parses the JSON response
-            .then(data => {
-                let instanceRows = data.map(instance => createInstanceRow(instance));
-                appendInstanceRows(instanceRows);
-            })
-            .catch(error => console.error('Error:', error));
-    };
-
-    const collectFormData = () => {
-        let form = document.getElementById('creationForm');
-        return new FormData(form);
-    };
-
-    const createInstance = () => {
-        let formData = collectFormData();
-
-        let url = 'http://127.0.0.1:9991/path-hash/vms/';  // Replace with your URL
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-            },
-            body: JSON.stringify({
-            python_envs: formData.getAll('python'),
-            size: formData.get('size')
-        })
-        })
-            .then(response => response.json())  // Parses the JSON response
-            .then(data => {listInstances();})
-            .catch(error => console.error('Error:', error));
-    };
-
-    const checkCustomRepo = () => {
-        let formData = collectFormData();
-
-        let url = 'http://127.0.0.1:9991/path-hash/repos/validate/' + formData.get('customRepo');
-
-        fetch(url, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*',
-            },
-        })
-            .then(response => response.json())  // Parses the JSON response
-            .then(data => console.log(data))
-            .catch(error => console.error('Error:', error));
-    }
-
-    const controlCollapse = () => {
-        let instanceListTable = document.getElementById('instanceListTable');
-        let instanceCreationForm = document.getElementById('instanceCreationForm');
-
-        let instanceListTableCollapse = new bootstrap.Collapse(instanceListTable, {toggle: false});
-        let instanceCreationFormCollapse = new bootstrap.Collapse(instanceCreationForm, {toggle: false});
-
-        instanceListTable.addEventListener('show.bs.collapse', event => instanceCreationFormCollapse.hide());
-        instanceCreationForm.addEventListener('show.bs.collapse', event => instanceListTableCollapse.hide());
-    }
-
-
-    document.getElementById('instanceListTable').addEventListener('shown.bs.collapse', listInstances);
-    document.getElementById('launch').addEventListener('click', createInstance);
-    document.getElementById('check').addEventListener('click', checkCustomRepo);
-    controlCollapse();
-
-</script>
+<script type="module" src="./scripts.js"></script>
 <!-- STYLE  SECTION -->
 
 <style>
