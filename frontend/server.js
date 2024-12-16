@@ -1,6 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 const path = require('path');
+const PORT = process.env.PORT || 3000;
 
 const server = http.createServer((req, res) => {
     const basePath = req.url === '/' ? './index.html' : `.${req.url}`;
@@ -34,3 +35,5 @@ const server = http.createServer((req, res) => {
 server.listen(3000, () => {
     console.log('Server running at http://localhost:3000/');
 });
+
+export default PORT;

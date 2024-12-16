@@ -1,4 +1,4 @@
-const BASE_URL = 'http://127.0.0.1:9991/path-hash/';
+const BASE_URL = document.URL.substring(0, document.URL.lastIndexOf('index'));
 
 const createLoadingSpinner = () => {
     let spinner = document.createElement('span');
@@ -7,19 +7,28 @@ const createLoadingSpinner = () => {
     return spinner;
 };
 
-const createColumn = (content, size = 4) => {
+const createColumn = (content, column_id = null, size = 4) => {
     let col = document.createElement('div');
     col.classList.add(`col-${size}`, 'border');
+    column_id ? col.id = column_id : null;
     content instanceof Element ? col.appendChild(content) : col.innerText = content;
     return col
 };
 
-const makeLink = (url) => {
+const createLink = (url) => {
     let a = document.createElement('a');
     a.href = 'http://' + url;
     a.textContent = url;
     return a
 };
+
+const createText = (text) => {
+    let span = document.createElement('span');
+    span.textContent = text;
+    span.classList.add('mx-3');
+    return span
+}
+
 
 const createDeleteButton = (instanceID) => {
     let deleteButton = document.createElement('button');
@@ -29,10 +38,47 @@ const createDeleteButton = (instanceID) => {
     return deleteButton;
 };
 
+const checkInstanceStatus = (instanceID) => {
+    let url = BASE_URL + 'api/vms/' + instanceID + '/status';
+
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+        },
+    })
+        .then(response => response.json())
+        .then(response => {
+            return response.jhub
+        })
+        .catch(error => console.error('Error:', error));
+};
+
+const instanceReady = (instance) => {
+    let ready = checkInstanceStatus(instance.id);
+    let col = document.getElementById(instance.id);
+
+    ready.then(isReady => {
+        if (isReady === 'ready') {
+            col.replaceChildren(...[createLink(`${instance.public_ip}:8080`)]);
+        } else if (isReady === 'error') {
+            col.replaceChildren(...[createText('Error ❌')]);
+        } else {
+            setTimeout(() => {
+                instanceReady(instance);
+            }, 5000);
+        }
+    });
+
+};
+
 const createInstanceRow = (instance) => {
     let row = document.createElement('div');
     row.classList.add('row', 'justify-content-center', 'text-center');
-    row.appendChild(createColumn(makeLink(`${instance.public_ip}:8080`)));
+    let ip_column = createColumn(createLoadingSpinner(), instance.id)
+    ip_column.appendChild(createText('Loading status of the instance...'));
+    row.appendChild(ip_column);
     row.appendChild(createColumn(instance.name));
     row.appendChild(createColumn(createDeleteButton(instance.id)));
     return row
@@ -44,7 +90,7 @@ const appendInstanceRows = (rows) => {
 };
 
 const listInstances = () => {
-    let url = BASE_URL + 'vms/';  // Replace with your URL
+    let url = BASE_URL + 'api/vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'GET',
@@ -57,6 +103,7 @@ const listInstances = () => {
         .then(data => {
             let instanceRows = data.map(instance => createInstanceRow(instance));
             appendInstanceRows(instanceRows);
+            data.forEach(instance => {instanceReady(instance);});
         })
         .catch(error => console.error('Error:', error));
 };
@@ -86,7 +133,7 @@ const createInstance = () => {
     createInstanceButton.appendChild(createLoadingSpinner());
 
 
-    let url = BASE_URL + 'vms/';  // Replace with your URL
+    let url = BASE_URL + 'api/vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'POST',
@@ -96,7 +143,7 @@ const createInstance = () => {
         },
         body: JSON.stringify({
             python_envs: formData.getAll('python'),
-            repo_urls: formData.getAll('customRepo'),
+            repo_urls: !formData.getAll('customRepo').filter(Boolean) ? formData.getAll('customRepo').filter(Boolean) : null,  // evil hack to not have [""]
             size: formData.get('size')
         })
     })
@@ -106,7 +153,7 @@ const createInstance = () => {
 
 
 const deleteInstance = (instanceID) => {
-    let url = BASE_URL + 'vms/' + instanceID;
+    let url = BASE_URL + 'api/vms/' + instanceID;
 
     fetch(url, {
         method: 'DELETE',
@@ -146,7 +193,7 @@ const repoValidationFail = () => {
 const checkCustomRepo = () => {
     let formData = collectFormData();
 
-    let url = BASE_URL + 'repos/validate/' + formData.get('customRepo');
+    let url = BASE_URL + 'api/repos/validate/' + formData.get('customRepo');
 
     fetch(url, {
         method: 'GET',
