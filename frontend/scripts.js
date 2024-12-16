@@ -39,7 +39,7 @@ const createDeleteButton = (instanceID) => {
 };
 
 const checkInstanceStatus = (instanceID) => {
-    let url = BASE_URL + 'api/vms/' + instanceID + '/status';
+    let url = BASE_URL + 'vms/' + instanceID + '/status';
 
     return fetch(url, {
         method: 'GET',
@@ -90,7 +90,7 @@ const appendInstanceRows = (rows) => {
 };
 
 const listInstances = () => {
-    let url = BASE_URL + 'api/vms/';  // Replace with your URL
+    let url = BASE_URL + 'vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'GET',
@@ -133,7 +133,7 @@ const createInstance = () => {
     createInstanceButton.appendChild(createLoadingSpinner());
 
 
-    let url = BASE_URL + 'api/vms/';  // Replace with your URL
+    let url = BASE_URL + 'vms/';  // Replace with your URL
 
     fetch(url, {
         method: 'POST',
@@ -153,7 +153,7 @@ const createInstance = () => {
 
 
 const deleteInstance = (instanceID) => {
-    let url = BASE_URL + 'api/vms/' + instanceID;
+    let url = BASE_URL + 'vms/' + instanceID;
 
     fetch(url, {
         method: 'DELETE',
@@ -193,7 +193,7 @@ const repoValidationFail = () => {
 const checkCustomRepo = () => {
     let formData = collectFormData();
 
-    let url = BASE_URL + 'api/repos/validate/' + formData.get('customRepo');
+    let url = BASE_URL + 'repos/validate/' + formData.get('customRepo');
 
     fetch(url, {
         method: 'GET',
