@@ -59,7 +59,12 @@ class CloudClient:
 
     def list_instances(self):
         response = self.client.list_instances()
-        instances = [Instance.model_validate(instance) for instance in response['instances']]
+
+        instances = []
+        for instance in response['instances']:
+            instance = Instance.model_validate(instance)
+            if 'redirect_id' in instance.labels:
+                instances.append(instance)
 
         return instances
 
