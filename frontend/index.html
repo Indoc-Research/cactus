@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport">
     <title>Resource Creation</title>
+    <link rel="icon" href="favicon.ico">
     <link href="/node_modules/bootstrap/dist/css/bootstrap.css" rel="stylesheet">
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
 </head>
@@ -22,7 +23,7 @@
                 <button type="button" id="createControl" data-bs-toggle="collapse"
                         data-bs-target="#instanceCreationForm"
                         aria-expanded="false"
-                        class="btn btn-primary btn-customized btn-lg">
+                        class="btn btn-primary btn-lg">
                     Create a new instance
                 </button>
             </div>
@@ -30,12 +31,12 @@
                 <button type="button" id="listControl" data-bs-toggle="collapse"
                         data-bs-target="#instanceListTable"
                         aria-expanded="false"
-                        class="btn btn-primary btn-customized btn-lg">
+                        class="btn btn-primary btn-lg">
                     Currently available instances
                 </button>
             </div>
         </div>
-        <div class="row collapse" id="instanceCreationForm" aria-expanded="false">
+        <div class="row collapse mt-5" id="instanceCreationForm" aria-expanded="false">
             <div class="col-md-12">
                 <form action="" id="creationForm" method="post">
                     <div class="row justify-content-center">
@@ -120,10 +121,10 @@
                                 </div>
                             </fieldset>
                             <!-- Submit Button -->
-                            <div class="form-group row text-center mb-5">
+                            <div class="form-group row text-center my-3">
                                 <div class="d-grid gap-2">
                                     <button type="button" id="launch" class="btn btn-primary btn-customized btn-lg">
-                                        Launch
+                                        Create Instance
                                     </button>
                                 </div>
                             </div>
@@ -132,7 +133,7 @@
                 </form>
             </div>
         </div>
-        <div class="row justify-content-center collapse mb-5" id="instanceListTable">
+        <div class="row justify-content-center collapse mt-5" id="instanceListTable">
             <div class="row justify-content-center">
                 <div class="col-md-10 form-1-box section-description wow fadeIn">
                     <h2>All currently available instances</h2>
@@ -162,7 +163,7 @@
             </div>
             <div class="row justify-content-center text-center">
                 <div class="col-8 d-grid gap-2 mt-5">
-                    <button type="button" id="refresh" class="btn btn-secondary btn-lg">
+                    <button type="button" id="refresh" class="btn btn-customized btn-secondary btn-lg">
                         Refresh the list of instances
                     </button>
                 </div>
@@ -179,101 +180,11 @@
 <!-- STYLE  SECTION -->
 
 <style>
-    .result {
-        padding-top: 30px;
-    }
-
-    .header {
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
-
-    .form-1-box {
-        padding-top: 30px;
-        text-align: left;
-    }
-
-    .form-1-box legend {
-        font-size: inherit;
-        line-height: 30px;
-        font-weight: 600;
-        text-transform: uppercase;
-        color: #555;
-    }
-
-    .form-1-box .form-check-label {
-        line-height: 1.5;
-        vertical-align: top;
-    }
-
-    .form-1-box input[type="text"],
-    .form-1-box input[type="email"],
-    .form-1-box input[type="password"] {
-        background: none;
-        border: 1px solid #ddd;
-        font-family: 'Open Sans', sans-serif;
-        font-size: 15px;
-        font-weight: 400;
-        color: #888;
-        box-shadow: none;
-    }
-
-    .form-1-box input[type="text"]:focus,
-    .form-1-box input[type="email"]:focus,
-    .form-1-box input[type="password"]:focus {
-        outline: 0;
-        background: none;
-        border: 1px solid #db5d50;
-        box-shadow: none;
-    }
-
-    .form-1-box input[type="text"]::-moz-placeholder,
-    .form-1-box input[type="email"]::-moz-placeholder,
-    .form-1-box input[type="password"]::-moz-placeholder {
-        color: #bbb;
-        font-style: italic;
-    }
-
-    .form-1-box input[type="text"]:-ms-input-placeholder,
-    .form-1-box input[type="email"]:-ms-input-placeholder,
-    .form-1-box input[type="password"]:-ms-input-placeholder {
-        color: #bbb;
-        font-style: italic;
-    }
-
-    .form-1-box input[type="text"]::-webkit-input-placeholder,
-    .form-1-box input[type="email"]::-webkit-input-placeholder,
-    .form-1-box input[type="password"]::-webkit-input-placeholder {
-        color: #bbb;
-        font-style: italic;
-    }
-
-    .form-1-box button.btn-customized {
-        margin-top: 1rem;
-        padding: .75rem 1.5rem;
+    button.btn-customized {
         background: #db5d50;
-        border: 0;
-        font-family: 'Open Sans', sans-serif;
         font-size: 15px;
         font-weight: 400;
         color: #fff;
-        box-shadow: none;
-    }
-
-    .form-1-box button.btn-customized:hover,
-    .form-1-box button.btn-customized:active,
-    .form-1-box button.btn-customized:focus,
-    .form-1-box button.btn-customized:active:focus,
-    .form-1-box button.btn-customized.active:focus,
-    .form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active,
-    .form-1-box button.btn.btn-primary:not(:disabled):not(.disabled):active:focus {
-        outline: 0;
-        background: #ca594d;
-        border: 0;
-        color: #fff;
-        box-shadow: none;
     }
 </style>
 

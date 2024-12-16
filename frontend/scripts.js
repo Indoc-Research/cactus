@@ -1,32 +1,47 @@
 const BASE_URL = 'http://127.0.0.1:9991/path-hash/';
 
+const createLoadingSpinner = () => {
+    let spinner = document.createElement('span');
+    spinner.classList.add('spinner-border', 'spinner-border-sm');
+    spinner.role = 'status';
+    return spinner;
+};
+
 const createColumn = (content, size = 4) => {
     let col = document.createElement('div');
     col.classList.add(`col-${size}`, 'border');
     content instanceof Element ? col.appendChild(content) : col.innerText = content;
     return col
-}
+};
 
 const makeLink = (url) => {
     let a = document.createElement('a');
     a.href = 'http://' + url;
     a.textContent = url;
     return a
-}
+};
+
+const createDeleteButton = (instanceID) => {
+    let deleteButton = document.createElement('button');
+    deleteButton.classList.add('btn', 'btn-danger', 'align-middle');
+    deleteButton.innerText = 'Delete Instance';
+    deleteButton.addEventListener('click', () => {deleteInstance(instanceID);});
+    return deleteButton;
+};
 
 const createInstanceRow = (instance) => {
     let row = document.createElement('div');
     row.classList.add('row', 'justify-content-center', 'text-center');
     row.appendChild(createColumn(makeLink(`${instance.public_ip}:8080`)));
     row.appendChild(createColumn(instance.name));
-    row.appendChild(createColumn('WIP: button DELETE'));
+    row.appendChild(createColumn(createDeleteButton(instance.id)));
     return row
-}
+};
 
 const appendInstanceRows = (rows) => {
     let table = document.getElementById('instancesTable');
     table.replaceChildren(...rows);
-}
+};
 
 const listInstances = () => {
     let url = BASE_URL + 'vms/';  // Replace with your URL
@@ -51,8 +66,25 @@ const collectFormData = () => {
     return new FormData(form);
 };
 
+const instanceCreationSuccess = (button) => {
+    button.removeChild(button.firstChild);
+    button.classList.replace('btn-customized', 'btn-outline-success');
+    button.innerText = 'Success ✅';
+};
+
+const instanceCreationFail = (button) => {
+    button.removeChild(button.firstChild);
+    button.classList.replace('btn-customized', 'btn-outline-danger');
+    button.innerText = 'Error ❌';
+};
+
 const createInstance = () => {
     let formData = collectFormData();
+
+    let createInstanceButton = document.getElementById('launch');
+    createInstanceButton.disabled = true;
+    createInstanceButton.appendChild(createLoadingSpinner());
+
 
     let url = BASE_URL + 'vms/';  // Replace with your URL
 
@@ -68,12 +100,24 @@ const createInstance = () => {
             size: formData.get('size')
         })
     })
-        .then(response => response.json())  // Parses the JSON response
-        .then(data => {
-            listInstances();
-        })
+        .then(response => response.status === 200 ? instanceCreationSuccess(createInstanceButton) : instanceCreationFail(createInstanceButton))
         .catch(error => console.error('Error:', error));
 };
+
+
+const deleteInstance = (instanceID) => {
+    let url = BASE_URL + 'vms/' + instanceID;
+
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => response.json())  // Parses the JSON response
+        .then(data => listInstances())
+        .catch(error => console.error('Error:', error));
+}
 
 const repoValidationReset = () => {
     let button = document.getElementById('check');
