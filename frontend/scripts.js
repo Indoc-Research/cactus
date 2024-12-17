@@ -2,7 +2,7 @@ const BASE_URL = document.URL.substring(0, document.URL.lastIndexOf('index'));
 
 const createLoadingSpinner = () => {
     let spinner = document.createElement('span');
-    spinner.classList.add('spinner-border', 'spinner-border-sm');
+    spinner.classList.add('spinner-border', 'spinner-border-sm', 'mx-2');
     spinner.role = 'status';
     return spinner;
 };
@@ -34,7 +34,11 @@ const createDeleteButton = (instanceID) => {
     let deleteButton = document.createElement('button');
     deleteButton.classList.add('btn', 'btn-danger', 'align-middle');
     deleteButton.innerText = 'Delete Instance';
-    deleteButton.addEventListener('click', () => {deleteInstance(instanceID);});
+    deleteButton.addEventListener('click', () => {
+        deleteInstance(instanceID);
+        deleteButton.appendChild(createLoadingSpinner());
+        deleteButton.disabled = true;
+    });
     return deleteButton;
 };
 
@@ -77,7 +81,7 @@ const createInstanceRow = (instance) => {
     let row = document.createElement('div');
     row.classList.add('row', 'justify-content-center', 'text-center');
     let ip_column = createColumn(createLoadingSpinner(), instance.id)
-    ip_column.appendChild(createText('Loading status of the instance...'));
+    ip_column.appendChild(createText('JupyterHub is starting...'));
     row.appendChild(ip_column);
     row.appendChild(createColumn(instance.name));
     row.appendChild(createColumn(createDeleteButton(instance.id)));
@@ -103,7 +107,9 @@ const listInstances = () => {
         .then(data => {
             let instanceRows = data.map(instance => createInstanceRow(instance));
             appendInstanceRows(instanceRows);
-            data.forEach(instance => {instanceReady(instance);});
+            data.forEach(instance => {
+                instanceReady(instance);
+            });
         })
         .catch(error => console.error('Error:', error));
 };
@@ -113,42 +119,72 @@ const collectFormData = () => {
     return new FormData(form);
 };
 
-const instanceCreationSuccess = (button) => {
-    button.removeChild(button.firstChild);
-    button.classList.replace('btn-customized', 'btn-outline-success');
-    button.innerText = 'Success ✅';
+const instanceCreationStarting = (button) => {
+    button.disabled = true;
+    button.appendChild(createLoadingSpinner());
 };
 
-const instanceCreationFail = (button) => {
+const instanceCreationSuccess = (button, text = 'Success ✅') => {
+    button.removeChild(button.firstChild);
+    button.classList.replace('btn-customized', 'btn-outline-success');
+    button.innerText = text;
+};
+
+const instanceCreationFail = (button, text = 'Error ❌') => {
     button.removeChild(button.firstChild);
     button.classList.replace('btn-customized', 'btn-outline-danger');
-    button.innerText = 'Error ❌';
+    button.innerText = text;
+};
+
+const instanceCreationReset = (button) => {
+    button.removeChild(button.firstChild);
+    button.classList.remove(...button.classList);
+    button.classList.add('btn', 'btn-primary', 'btn-customized', 'btn-lg');
+    button.innerText = 'Create Instance';
+    button.disabled = false;
+}
+
+const getCustomRepos = (formData, button) => {
+    if (button.getAttribute('data-valid-repo') !== 'valid') {
+        return null;
+    } else {
+        let repos = formData.getAll('customRepo').filter(Boolean);  // evil hack to not have [""]
+
+        if (repos && repos.length) {
+            return repos;
+        } else {
+            return null;
+        }
+    }
 };
 
 const createInstance = () => {
     let formData = collectFormData();
 
     let createInstanceButton = document.getElementById('launch');
-    createInstanceButton.disabled = true;
-    createInstanceButton.appendChild(createLoadingSpinner());
+    instanceCreationStarting(createInstanceButton);
 
+    let button = document.getElementById('check');
+    if (button.getAttribute('data-valid-repo') === 'invalid') {
+        instanceCreationFail(createInstanceButton, 'Invalid Repository ❌');
+    } else {
+        let url = BASE_URL + 'vms/';  // Replace with your URL
 
-    let url = BASE_URL + 'vms/';  // Replace with your URL
-
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-        },
-        body: JSON.stringify({
-            python_envs: formData.getAll('python'),
-            repo_urls: !formData.getAll('customRepo').filter(Boolean) ? formData.getAll('customRepo').filter(Boolean) : null,  // evil hack to not have [""]
-            size: formData.get('size')
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+            },
+            body: JSON.stringify({
+                python_envs: formData.getAll('python'),
+                repo_urls: getCustomRepos(formData, button),
+                size: formData.get('size')
+            })
         })
-    })
-        .then(response => response.status === 200 ? instanceCreationSuccess(createInstanceButton) : instanceCreationFail(createInstanceButton))
-        .catch(error => console.error('Error:', error));
+            .then(response => response.status === 200 ? instanceCreationSuccess(createInstanceButton) : instanceCreationFail(createInstanceButton))
+            .catch(error => console.error('Error:', error));
+    }
 };
 
 
@@ -173,6 +209,9 @@ const repoValidationReset = () => {
         button.classList.add('btn', 'btn-primary')
         button.innerText = 'Check Repository';
         button.disabled = false;
+        button.removeAttribute('data-valid-repo');
+        let createInstanceButton = document.getElementById('launch');
+        instanceCreationReset(createInstanceButton);
     }
 };
 
@@ -181,6 +220,7 @@ const repoValidationSuccess = () => {
     button.classList.replace('btn-primary', 'btn-outline-success');
     button.innerText = 'Valid Repository ✅';
     button.disabled = true;
+    button.setAttribute('data-valid-repo', 'valid')
 };
 
 const repoValidationFail = () => {
@@ -188,6 +228,7 @@ const repoValidationFail = () => {
     button.classList.replace('btn-primary', 'btn-outline-danger');
     button.innerText = 'Invalid Repository ❌';
     button.disabled = true;
+    button.setAttribute('data-valid-repo', 'invalid')
 };
 
 const checkCustomRepo = () => {
@@ -215,13 +256,17 @@ const controlCollapse = () => {
     let instanceCreationFormCollapse = new bootstrap.Collapse(instanceCreationForm, {toggle: false});
 
     instanceListTable.addEventListener('show.bs.collapse', event => instanceCreationFormCollapse.hide());
-    instanceCreationForm.addEventListener('show.bs.collapse', event => instanceListTableCollapse.hide());
+    instanceCreationForm.addEventListener('show.bs.collapse', event => {
+        instanceListTableCollapse.hide();
+        let createInstanceButton = document.getElementById('launch');
+        instanceCreationReset(createInstanceButton);
+    });
 }
 
 
 document.getElementById('instanceListTable').addEventListener('shown.bs.collapse', listInstances);
 document.getElementById('launch').addEventListener('click', createInstance);
 document.getElementById('check').addEventListener('click', checkCustomRepo);
-document.getElementById('customRepo').addEventListener('change', repoValidationReset);
+document.getElementById('customRepo').addEventListener('keyup', repoValidationReset);
 document.getElementById('refresh').addEventListener('click', listInstances);
 controlCollapse();
