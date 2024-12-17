@@ -1,4 +1,4 @@
-FROM python:3.11.11-bookworm AS production-environment
+FROM python:3.11.11-bookworm AS backend-environment
 
 ENV PYTHONDONTWRITEBYTECODE=true \
     PYTHONIOENCODING=UTF-8 \
@@ -14,13 +14,25 @@ RUN apt-get update \
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
 
-COPY poetry.lock pyproject.toml ./
+WORKDIR /app/backend
+
+COPY backend/poetry.lock backend/pyproject.toml ./
 
 RUN poetry install --only main --no-root --no-interaction
 
 
-FROM production-environment AS cactus-image
+FROM node:22.12-bookworm AS frontend-environment
 
-COPY cactus ./cactus
+WORKDIR /frontend
+
+COPY frontend ./
+
+RUN npm install
+
+
+FROM backend-environment AS cactus-image
+
+COPY backend/cactus ./cactus
+COPY --from=frontend-environment /frontend /app/frontend
 
 ENTRYPOINT ["python3", "-m", "cactus"]

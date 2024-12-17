@@ -1,7 +1,10 @@
 import logging
 from functools import lru_cache
+from pathlib import Path
 from uuid import UUID
 
+from pydantic import DirectoryPath
+from pydantic import Field
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
@@ -28,6 +31,7 @@ class Settings(BaseSettings):
     github_oauth_client_secret: str = ''
 
     path_hash: str = '/path-hash'
+    frontend_folder_path: DirectoryPath = Field(default_factory=lambda: Path(__file__).parents[2] / 'frontend')
 
 
 @lru_cache(1)

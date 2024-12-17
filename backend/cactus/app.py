@@ -5,7 +5,7 @@ from cactus.config import get_settings
 from fastapi import FastAPI
 from fastapi.middleware import Middleware
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.staticfiles import StaticFiles
+from fastapi.staticfiles import StaticFiles
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
@@ -25,8 +25,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     setup_routers(app, settings)
 
-    app.mount(f'{settings.path_hash}', StaticFiles(directory='../frontend', html=True), name='frontend')
-
     return app
 
 
@@ -35,6 +33,8 @@ def setup_routers(app: FastAPI, settings: Settings) -> None:
 
     app.include_router(vm_router, prefix=settings.path_hash)
     app.include_router(repo_router, prefix=settings.path_hash)
+
+    app.mount(settings.path_hash, StaticFiles(directory=settings.frontend_folder_path, html=True))
 
 
 def setup_middlewares() -> list[Middleware]:
