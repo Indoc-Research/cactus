@@ -14,10 +14,9 @@ This PoC showcases the automated deployment of Research Pods on GDPR-compliant E
 Below, you’ll find three video recordings that illustrate the key functionalities of Research Pods.
 
 
-
 ### 1️⃣ Deploying a Research Pod from pre-configured RS stacks
 
-<video src="./media/ResearchPod_Creation_demo.mp4" width="768" height="432" controls></video>
+<img src="./media/ResearchPod_Creation_demo.gif" width="768" height="432">
 
 This demo showcases:
 - Selecting from predefined RS stacks.
@@ -28,7 +27,7 @@ This demo showcases:
 
 ### 2️⃣ Deploying a Research Pod with custom RS from a public repository
 
-<video src="./media/ResearchPod_custom_RS.mp4" width="768" height="432" controls></video>
+<img src="./media/ResearchPod_custom_RS.gif" width="768" height="432">
 
 This demo illustrates:
 - Provisioning a Research Pod with a custom RS sourced from a GitHub repository URL.
@@ -37,7 +36,7 @@ This demo illustrates:
 
 ### 3️⃣ Deleting Research Pods for efficient cost management
 
-<video src="./media/ResearchPod_deletion_demo.mp4" width="768" height="432" controls></video>
+<img src="./media/ResearchPod_deletion_demo.gif" width="768" height="432">
 
 This demo highlights:
 - Deleting previously created Research Pods.
