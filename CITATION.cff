@@ -8,8 +8,8 @@ type: software
 authors:
   - given-names: Antonio
     family-names: Cascais
-    email: acascais@indocresearch.org
     affiliation: Indoc Research Europe gGmbH
+    orcid: 'https://orcid.org/0009-0005-3491-1894'
   - given-names: Dennis
     family-names: Doll
     email: ddoll@indocresearch.org
@@ -17,16 +17,13 @@ authors:
     orcid: 'https://orcid.org/0000-0002-3806-9324'
   - given-names: Matvey
     family-names: Loshakov
-    email: mloshakov@indocresearch.org
     affiliation: Indoc Research Europe gGmbH
     orcid: 'https://orcid.org/0009-0009-7571-073X'
   - given-names: Carlos
     family-names: Montesinos Estrada
-    email: cmontesinos@indocresearch.org
     affiliation: Indoc Research Europe gGmbH
   - given-names: Vadym
     family-names: Moshynskyi
-    email: vmoshynskyi@indocresearch.org
     affiliation: Indoc Research Europe gGmbH
     orcid: 'https://orcid.org/0009-0008-3918-1132'
 identifiers:
@@ -50,4 +47,4 @@ keywords:
 license: AGPL-3.0
 commit: 9157b4f6b51313dd162ab5a0a2ed13b901c9d983
 version: 0.1.0
-date-released: '2025-02-25'
+date-released: '2025-02-28'
