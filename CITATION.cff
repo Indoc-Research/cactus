@@ -1,0 +1,50 @@
+cff-version: 1.2.0
+title: cactus
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file. Authors are listed in alphabetical
+  order.
+type: software
+authors:
+  - given-names: Antonio
+    family-names: Cascais
+    affiliation: Indoc Research Europe gGmbH
+    orcid: 'https://orcid.org/0009-0005-3491-1894'
+  - given-names: Dennis
+    family-names: Doll
+    email: ddoll@indocresearch.org
+    affiliation: Indoc Research Europe gGmbH
+    orcid: 'https://orcid.org/0000-0002-3806-9324'
+  - given-names: Matvey
+    family-names: Loshakov
+    affiliation: Indoc Research Europe gGmbH
+    orcid: 'https://orcid.org/0009-0009-7571-073X'
+  - given-names: Carlos
+    family-names: Montesinos Estrada
+    affiliation: Indoc Research Europe gGmbH
+  - given-names: Vadym
+    family-names: Moshynskyi
+    affiliation: Indoc Research Europe gGmbH
+    orcid: 'https://orcid.org/0009-0008-3918-1132'
+identifiers:
+  - type: url
+    value: 'https://github.com/Indoc-Research/cactus'
+repository-code: 'https://github.com/Indoc-Research/cactus'
+abstract: >-
+  Welcome to cactus, our Research Pod Proof-of-Concept
+  repository! This project is - for the most part - the
+  outcome of a 2-day hackathon of the Indoc Research Europe
+  gGmbH team, and it showcases what we call "Research Pods".
+  In a nutshell, Research Pods enable the on-demand
+  deployment, configuration, and management of customizable,
+  cloud-based JupyterHub environments, designed to
+  streamline collaborative research software (RS) usage and
+  development.
+keywords:
+  - Research Software
+  - Open Science
+  - Scalable Cloud Computing
+license: AGPL-3.0
+commit: 9157b4f6b51313dd162ab5a0a2ed13b901c9d983
+version: 0.1.0
+date-released: '2025-02-28'
